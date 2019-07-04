@@ -10,11 +10,19 @@ using jwttokendemo.Helpers;
 using JWT;
 using JWT.Algorithms;
 using JWT.Builder;
+using System.Web.Http.Cors;
+using MongoDB.Driver;
 
 namespace jwttokendemo.Controllers
 {
+    [EnableCors(origins: "http://localhost:3000", headers: "*", methods: "*")]
+
+    
     public class LoginController : ApiController
     {
+
+        Mongohelp mdb = new Mongohelp();
+        
         HttpResponseMessage response;
         public string Account { get; set; }
         public string Password { get; set; }
@@ -25,10 +33,10 @@ namespace jwttokendemo.Controllers
             {
                 #region 檢查帳號與密碼是否正確
                 // 這裡可以修改成為與後端資料庫內的使用者資料表進行比對
-                var expectAccount = "test@123.com";
-                var expectPassword = "123abc";
-                if (expectAccount == Account &&
-                    expectPassword == Password)
+             
+                //var expectAccount = "test@123.com";
+                //var expectPassword = "123abc";
+                if (mdb.getstudent(Account, Password))
                 {
                     #region 產生這次通過身分驗證的存取權杖 Access Token
                     string secretKey = MainHelper.SecretKey;
@@ -50,6 +58,7 @@ namespace jwttokendemo.Controllers
                     #endregion
 
                     // 帳號與密碼比對正確，回傳帳密比對正確
+                   
                     response = this.Request.CreateResponse<APIResult>(HttpStatusCode.OK, new APIResult()
                     {
                         Success = true,
